@@ -1,0 +1,14 @@
+Cybersecurity Team Meeting
+
+Celine, Maria, Souhil, Diouf, Shruti and Joudy are attending the meeting.
+
+Celine presents the current project status.
+Maria proposes testing the new architecture on Friday.
+Souhil approves the proposal and suggests adding additional tests.
+
+Diouf presents the results of the initial security tests.
+Shruti identifies a possible improvement concerning session management.
+Joudy proposes documenting the changes before the next meeting.
+
+The team decides to continue testing and prepare a new version.
+The meeting ends at 5 PM.

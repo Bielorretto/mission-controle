@@ -1,2 +1,10 @@
 buzz/
 docs/
+
+
+# Python generated files
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.venv/

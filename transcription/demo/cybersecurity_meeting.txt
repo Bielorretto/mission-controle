@@ -1,0 +1,15 @@
+Cybersecurity Team Meeting
+
+Date: September 15, 2026
+Participants: Celine, Maria, Souhil, Diouf, Shruti and Joudy
+
+Celine presents the current status of the security audit for the Mission Control application.
+
+The team has identified two medium-priority vulnerabilities concerning user session management. Souhil proposes fixing these issues before adding new features.
+
+After discussion, the team decides to address both vulnerabilities before Friday, September 18.
+
+Souhil is responsible for preparing the fixes and submitting them for review.
+Shruti will perform the security tests after the fixes are integrated.
+
+The next meeting is planned for Monday to review the progress of the fixes.
