@@ -37,4 +37,16 @@ def test_orchestrator() -> None:
     assert len(result.decisions) == 1
     assert len(result.actions) == 1
     assert result.actions[0].status == "todo"
-    
+
+
+def test_orchestrator_invokes_publishers_with_analysis() -> None:
+    received = []
+
+    orchestrator = MissionControlOrchestrator(
+        analyzer=FakeMeetingAnalyzer(),
+        publishers=[received.append],
+    )
+
+    result = orchestrator.run("This is a test meeting transcript.")
+
+    assert received == [result]
