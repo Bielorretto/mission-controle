@@ -1,6 +1,6 @@
 from collections.abc import Callable
 
-from mission_control.models import MeetingAnalysis
+from core.models import MeetingAnalysis
 
 
 Analyzer = Callable[[str], MeetingAnalysis]
