@@ -18,6 +18,9 @@ Usage:
 import dataclasses
 import datetime
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from core.integrations.la_suite_docs_publisher import LaSuiteDocsPublisher
 from core.ollama_analyzer import OllamaMeetingAnalyzer
