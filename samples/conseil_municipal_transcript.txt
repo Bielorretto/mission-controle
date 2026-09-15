@@ -1,0 +1,51 @@
+Réunion du conseil municipal - Commission Numérique et Services aux Usagers
+Mairie de Villeneuve-sur-Marne, 14 janvier 2026, 14h00
+
+Présents : Sophie Marchand (adjointe au numérique), Karim Belaïd (DSI), Anne Roussel
+(responsable service urbanisme), Thomas Lefèvre (référent accessibilité numérique).
+
+Sophie Marchand ouvre la séance en rappelant l'objectif : faire le point sur la
+migration des services municipaux vers La Suite numérique et préparer le
+déploiement de l'outil de prise de rendez-vous en ligne pour le service
+urbanisme.
+
+Karim Belaïd présente l'état d'avancement de la migration. Les agents du service
+état civil utilisent désormais Docs pour la rédaction collaborative des comptes
+rendus. La messagerie a été migrée pour 80% des agents. Il reste à migrer le
+service urbanisme et le service technique, ce qui est prévu avant la fin du mois
+de février.
+
+Anne Roussel signale un problème : les formulaires actuels ne sont pas
+accessibles aux personnes malvoyantes, ce qui pose un risque de non-conformité
+avec les obligations d'accessibilité numérique du secteur public. Elle demande
+qu'un audit soit réalisé avant le déploiement du nouvel outil de prise de
+rendez-vous.
+
+Après discussion, il est décidé que le service urbanisme ne déploiera pas
+l'outil de prise de rendez-vous en ligne tant que l'audit d'accessibilité n'aura
+pas été réalisé et ses conclusions intégrées.
+
+Thomas Lefèvre propose de piloter cet audit avec un prestataire spécialisé déjà
+référencé par la mairie. Il indique pouvoir lancer la consultation rapidement.
+
+Il est décidé de confier le pilotage de l'audit d'accessibilité à Thomas
+Lefèvre, en lien avec le prestataire référencé.
+
+Karim Belaïd rappelle que la migration de la messagerie du service technique
+doit être terminée avant le 28 février 2026 pour respecter le calendrier
+global validé par la direction générale des services.
+
+Sophie Marchand demande à Karim Belaïd de préparer un tableau de bord de suivi
+de la migration, à présenter lors du prochain comité de pilotage.
+
+Anne Roussel demande que le compte rendu de cette réunion soit publié sur Docs
+et partagé avec l'ensemble des agents du service urbanisme d'ici vendredi.
+
+Il est décidé que les prochaines réunions de suivi de cette commission auront
+lieu toutes les deux semaines, le mardi à 14h00, jusqu'à la fin du projet de
+migration.
+
+Aucune date n'est fixée pour la présentation finale du tableau de bord, qui
+dépendra de l'avancement de la migration du service technique.
+
+La séance est levée à 15h10.
