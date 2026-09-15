@@ -1,3 +1,5 @@
 buzz/
 docs/
 __pycache__/
+.env
+*/.env
