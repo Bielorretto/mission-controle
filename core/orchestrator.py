@@ -1,16 +1,16 @@
 from collections.abc import Callable
 
+from core.analysis import MeetingAnalyzer
 from core.models import MeetingAnalysis
 
 
-Analyzer = Callable[[str], MeetingAnalysis]
 Publisher = Callable[[MeetingAnalysis], None]
 
 
 class MissionControlOrchestrator:
     def __init__(
         self,
-        analyzer: Analyzer,
+        analyzer: MeetingAnalyzer,
         publishers: list[Publisher] | None = None,
     ) -> None:
         self.analyzer = analyzer
@@ -20,7 +20,7 @@ class MissionControlOrchestrator:
         if not transcript.strip():
             raise ValueError("Transcript cannot be empty.")
 
-        analysis = self.analyzer(transcript)
+        analysis = self.analyzer.analyze(transcript)
 
         for publisher in self.publishers:
             publisher(analysis)
