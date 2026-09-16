@@ -1,0 +1,20 @@
+Team Planning Meeting
+
+Date: September 15, 2026
+Participants: Celine, Maria, Souhil, Diouf, Shruti and Joudy
+
+The team is preparing the schedule for the next two weeks.
+
+Celine proposes starting by finalizing the notification system integration. After discussion, the team approves the proposal.
+
+Diouf says that he can work on the integration on Wednesday and Thursday.
+
+Maria then proposes improving the technical documentation. The team decides to start this task after the notification system is finalized.
+
+A project review is scheduled for Friday, September 25.
+
+Celine will prepare the detailed schedule before Wednesday morning.
+Diouf will start the notification integration on Wednesday.
+Maria will prepare an initial version of the technical documentation after the notification system review.
+
+The next team meeting will take place on Friday, September 25 at 2 PM.

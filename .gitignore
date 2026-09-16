@@ -1,5 +1,18 @@
 buzz/
 docs/
-__pycache__/
+
+mcp-servers/keycloak-backup/
+
+# Environment files
 .env
 */.env
+
+# Python generated files
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.venv/
+*.pyo
+*.pyd
+
