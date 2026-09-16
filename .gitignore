@@ -1,6 +1,7 @@
 buzz/
 docs/
 mcp-servers/keycloak-backup/
+mcp-servers/.env
 
 
 # Python generated files
