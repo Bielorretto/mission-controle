@@ -62,7 +62,7 @@ def test_raises_clear_error_for_unsupported_extension(tmp_path, monkeypatch):
     monkeypatch.setenv("MEET_SOURCE", "fixture")
     monkeypatch.setenv("MEET_TRANSCRIPT_FIXTURE_PATH", str(path))
 
-    with pytest.raises(TranscriptSourceError, match="Unsupported transcript file type"):
+    with pytest.raises(TranscriptSourceError, match="Unsupported transcript format"):
         get_latest_meeting_transcript()
 
 

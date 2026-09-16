@@ -16,9 +16,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+from mission_control.transcript import load_transcript
 
-SUPPORTED_TRANSCRIPT_EXTENSIONS = {".txt", ".md"}
+load_dotenv()
 
 _MEET_MCP_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _MEET_MCP_DIR.parent.parent
@@ -29,32 +29,15 @@ class TranscriptSourceError(RuntimeError):
     """Raised when a meeting transcript cannot be retrieved."""
 
 
-def _read_fixture_transcript(path_str: str) -> str:
-    path = Path(path_str)
-
-    if not path.exists():
-        raise TranscriptSourceError(
-            f"Fixture transcript not found at '{path}'. "
-            "Set MEET_TRANSCRIPT_FIXTURE_PATH to a valid .txt or .md file."
-        )
-
-    if path.suffix.lower() not in SUPPORTED_TRANSCRIPT_EXTENSIONS:
-        raise TranscriptSourceError(
-            f"Unsupported transcript file type '{path.suffix}' for '{path}'. "
-            f"Supported types: {sorted(SUPPORTED_TRANSCRIPT_EXTENSIONS)}."
-        )
-
-    text = path.read_text(encoding="utf-8").strip()
-
-    if not text:
-        raise TranscriptSourceError(f"Fixture transcript at '{path}' is empty.")
-
-    return text
-
-
 def _get_latest_meeting_transcript_fixture() -> dict:
     fixture_path = os.environ.get("MEET_TRANSCRIPT_FIXTURE_PATH", DEFAULT_FIXTURE_PATH)
-    transcript = _read_fixture_transcript(fixture_path)
+
+    try:
+        transcript = load_transcript(fixture_path)
+    except (FileNotFoundError, ValueError) as exc:
+        raise TranscriptSourceError(
+            f"Could not load fixture transcript at '{fixture_path}': {exc}"
+        ) from exc
 
     # These fields are intentionally left empty/None rather than parsed or
     # guessed from the fixture file: a plain .txt/.md transcript has no
@@ -66,7 +49,7 @@ def _get_latest_meeting_transcript_fixture() -> dict:
         "started_at": None,
         "ended_at": None,
         "participants": [],
-        "transcript": transcript,
+        "transcript": transcript.content.strip(),
         "source": "fixture",
     }
 
