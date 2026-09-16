@@ -23,7 +23,6 @@ class KeycloakAuth:
             **extra,
         }
         response = requests.post(self.token_url, data=data)
-        print(response.status_code, response.text) 
         response.raise_for_status()
         payload = response.json()
 
@@ -39,6 +38,7 @@ class KeycloakAuth:
             "password",
             username=self.username,
             password=self.password,
+            scope="openid profile email",
         )
 
     def _refresh(self):
