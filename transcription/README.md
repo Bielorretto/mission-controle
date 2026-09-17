@@ -1,250 +1,178 @@
-# Mission Control — Transcript Input
+# Mission Control — Transcript Input & Meeting Reports
 
-> A Python module for importing meeting transcripts into Mission Control, with support for TXT and Markdown files.
+## Overview
 
-## 🎯 Project Overview
+This module provides the transcript input and meeting report generation layer for **Mission Control**.
 
-**Mission Control** is a meeting-assistance project developed during a hackathon.
+The goal is to keep the Mission Control pipeline functional even when external meeting services such as Google Meet are unavailable.
 
-The goal is to transform meeting transcripts into structured information that can later be used by a local AI system and integrated into other services.
-
-The overall pipeline is:
+The implemented flow is:
 
 ```text
-Meeting Transcript
-       ↓
-Transcript Input
-       ↓
-Local AI Analysis
-       ↓
+Transcript file
+      │
+      ▼
+load_transcript()
+      │
+      ▼
+Transcript
+      │
+      ▼
+Local AI analysis
+      │
+      ▼
 MeetingAnalysis
-       ↓
-Grist
-       ↓
-Buzz
+      │
+      ▼
+generate_markdown_report()
+      │
+      ▼
+Markdown meeting report
 ```
 
-The **Transcript Input** component is the entry point of this pipeline.
-
-Its role is to make sure that Mission Control can still process a meeting even when an external meeting service such as Google Meet is unavailable.
+The transcript loader and report generator are independent from the AI implementation and from external meeting providers.
 
 ---
 
-## 👨‍💻 My Contribution
+## Implemented Features
 
-As **Dev 6**, I developed the **Transcript Input** component.
+### 1. Transcript Input
 
-My responsibilities for this part were:
+The transcript loader supports:
 
-- Designing a consistent `Transcript` representation.
-- Implementing transcript loading from files.
-- Supporting `.txt` and `.md` formats.
-- Validating input files.
-- Preserving French UTF-8 content and accents.
-- Rejecting empty transcripts.
-- Handling invalid or unsupported files.
-- Creating realistic French demo transcripts.
-- Writing automated tests with `pytest`.
+- `.txt` files
+- `.md` Markdown files
+- UTF-8 encoded content
+- French and other Unicode characters
+- Empty-file validation
+- Missing-file validation
+- Unsupported-format validation
+- File-path validation
 
-The module exposes a simple interface:
-
-```python
-load_transcript(path) -> Transcript
-```
-
-This keeps the rest of the application independent from the way transcripts are stored.
-
----
-
-# 🏗️ Architecture
-
-The component is intentionally small and modular:
-
-```text
-mission_control/
-└── transcript/
-    ├── __init__.py
-    ├── loader.py
-    └── models.py
-```
-
-### `models.py`
-
-Defines the data structure returned by the loader.
+Main API:
 
 ```python
-@dataclass(frozen=True)
-class Transcript:
-    path: str
-    content: str
-    format: str
+from mission_control.transcript import load_transcript
+
+transcript = load_transcript("demo/project_alpha.md")
 ```
 
-A transcript contains:
-
-| Field | Description |
-|---|---|
-| `path` | Path of the source file |
-| `content` | Full transcript content |
-| `format` | Input format (`txt` or `md`) |
-
-Using a dataclass avoids unnecessary boilerplate while making the expected structure explicit.
-
-`frozen=True` makes the object immutable after creation, preventing accidental modifications during later processing.
-
----
-
-# 📥 Transcript Loader
-
-The main logic is implemented in:
-
-```text
-mission_control/transcript/loader.py
-```
-
-The public function is:
-
-```python
-load_transcript(path)
-```
-
-It performs several validation steps before returning a `Transcript`.
-
-### 1. Validate the path
-
-The loader first checks that the provided path exists.
-
-```python
-if not file_path.exists():
-    raise FileNotFoundError(...)
-```
-
-This prevents the application from attempting to read a file that does not exist.
-
-### 2. Validate that the path is a file
-
-A valid path could technically point to a directory.
-
-Therefore, the loader also checks:
-
-```python
-if not file_path.is_file():
-    raise ValueError(...)
-```
-
-### 3. Validate the format
-
-Mission Control currently supports:
-
-```python
-SUPPORTED_EXTENSIONS = {".txt", ".md"}
-```
-
-The extension is normalized using:
-
-```python
-extension = file_path.suffix.lower()
-```
-
-This means `.TXT` and `.txt` are treated consistently.
-
-Unsupported formats are rejected instead of silently processed.
-
-### 4. Read UTF-8 content
-
-Transcripts are read using:
-
-```python
-content = file_path.read_text(encoding="utf-8")
-```
-
-Explicit UTF-8 handling is important because Mission Control is expected to process French meetings containing characters such as:
-
-```text
-é è ê ë à ç ù œ
-```
-
-### 5. Reject empty transcripts
-
-An empty or whitespace-only transcript is not useful for the AI pipeline.
-
-The loader therefore checks:
-
-```python
-if not content.strip():
-    raise ValueError("Transcript is empty")
-```
-
-### 6. Return a consistent object
-
-After validation, the loader returns:
+The loader returns a consistent `Transcript` object:
 
 ```python
 Transcript(
-    path=str(file_path),
-    content=content,
-    format=extension[1:],
+    path="demo/project_alpha.md",
+    content="...",
+    format="md",
 )
 ```
 
-The rest of Mission Control therefore receives the same type of object regardless of whether the original file was TXT or Markdown.
+This provides a clean interface for the rest of the Mission Control pipeline.
 
 ---
 
-# 🧪 Automated Testing
+## 2. MeetingAnalysis Model
 
-The component is tested with **pytest**.
+The analysis layer defines the structured result expected from the Local AI analysis step.
 
-The test suite covers:
+The shared `MeetingAnalysis` contract contains:
 
-- Valid TXT files
-- Valid Markdown files
-- French accents
-- Empty files
-- Missing files
-- Unsupported extensions
-
-Current result:
-
-```text
-6 passed
-```
+- Meeting ID
+- Meeting title
+- Detected language
+- Summary
+- Decisions
+- Actions
+- Assignees
+- Due dates
+- Action status
 
 Example:
 
 ```python
-def test_empty_transcript():
-    with pytest.raises(ValueError, match="Transcript is empty"):
-        load_transcript(DATA_DIR / "empty.txt")
+MeetingAnalysis(
+    meeting_id="meeting-2026-09-15-001",
+    title="Project Alpha",
+    language="en",
+    summary="Meeting summary...",
+    decisions=[
+        Decision(
+            description="Use option B."
+        )
+    ],
+    actions=[
+        Action(
+            id="action-001",
+            description="Prepare the presentation",
+            assignee="Celine",
+            due_date="2026-09-18",
+            status="todo",
+        )
+    ],
+)
 ```
 
-This test verifies that invalid input is rejected with the expected error.
+Unknown information is represented with `None`.
+
+The system does **not** invent missing assignees or deadlines.
 
 ---
 
-# 🇫🇷 French / UTF-8 Support
+## 3. Markdown Meeting Reports
 
-French text is an important requirement because meeting transcripts can contain names, accents and punctuation that must not be corrupted.
-
-For example:
-
-```text
-Élodie présente l'état d'avancement du projet.
-```
-
-The loader explicitly uses UTF-8:
+A structured `MeetingAnalysis` can be converted into a clean Markdown report.
 
 ```python
-read_text(encoding="utf-8")
+from mission_control.report import generate_markdown_report
+
+report = generate_markdown_report(analysis)
 ```
 
-This ensures that the original transcript is preserved before being passed to the AI analysis stage.
+The generated report contains:
+
+```text
+# Meeting Title
+
+Meeting metadata
+
+## Summary
+
+...
+
+## Decisions
+
+- ...
+
+## Actions
+
+| Action | Assignee | Due date | Status |
+|---|---|---|---|
+| ... | ... | ... | ... |
+```
+
+Reports can also be saved directly to disk:
+
+```python
+from mission_control.report import save_markdown_report
+
+save_markdown_report(
+    analysis,
+    "demo/reports/project_alpha_demo_report.md",
+)
+```
+
+Missing action information is handled safely:
+
+- Unknown assignee → `Unknown`
+- Missing due date → `Not specified`
+- No decisions → `No decisions recorded.`
+- No actions → `No actions recorded.`
 
 ---
 
-# 📄 Demo Transcripts
+## 4. Demo Transcripts
 
-Three realistic French meeting transcripts are included:
+Three realistic demo transcripts are included:
 
 ```text
 demo/
@@ -253,167 +181,126 @@ demo/
 └── team_planning.txt
 ```
 
-They simulate different types of meetings:
+The demo transcripts are intentionally written in **English** for the hackathon demonstration.
 
-### Cybersecurity meeting
+French/UTF-8 handling is tested separately with:
 
-Contains:
+```text
+tests/data/french_accents.txt
+```
 
-- Participants
-- Security vulnerabilities
-- Decisions
-- Assigned actions
-- Deadlines
-- Follow-up meeting
+Example content:
 
-### Project Alpha
+```text
+Équipe cybersécurité — réunion
+Céline présente l'état d'avancement.
+La réunion est très productive et terminée à 17h.
+```
 
-Contains:
-
-- Project progress
-- Performance issues
-- Decisions
-- Multiple actions
-- Deadlines
-
-### Team planning
-
-Contains:
-
-- Team planning
-- Proposed tasks
-- Decisions
-- Assigned responsibilities
-- Future meeting
-
-These examples are designed to resemble the type of input that will later be processed by the local AI analysis component.
+This verifies that the loader preserves Unicode and French accents correctly.
 
 ---
 
-# 🔌 Integration With Mission Control
+## 5. Test Coverage
 
-The important design decision is that the AI system does **not** need to know how the transcript was obtained.
+The project currently contains **10 automated tests**.
 
-For example:
+### Transcript tests
 
-```python
-from mission_control.transcript import load_transcript
+The test suite verifies:
 
-transcript = load_transcript("meeting.txt")
+- Valid TXT loading
+- Valid Markdown loading
+- French accents preservation
+- Empty transcript rejection
+- Missing file rejection
+- Unsupported extension rejection
 
-print(transcript.content)
+### Report tests
+
+The test suite verifies:
+
+- Markdown report generation
+- Missing action information
+- Empty decisions/actions
+- Saving reports to disk
+
+Run the complete test suite with:
+
+```bash
+cd transcription
+python -m pytest -v
 ```
 
-The AI analysis layer can then consume:
-
-```python
-transcript.content
-```
-
-This creates a clean separation:
+Current result:
 
 ```text
-File
- ↓
-Transcript Loader
- ↓
+10 passed
+```
+
+---
+
+## 6. End-to-End Demo
+
+The complete implemented workflow can be demonstrated with:
+
+```text
+project_alpha.md
+       ↓
+load_transcript()
+       ↓
 Transcript
- ↓
-AI Analysis
+       ↓
+MeetingAnalysis
+       ↓
+generate_markdown_report()
+       ↓
+project_alpha_demo_report.md
 ```
 
-In the future, another input source could provide the transcript without changing the AI analysis layer.
+The `MeetingAnalysis` used in the local demonstration is a simulated analysis result.
 
-For example:
+In the complete Mission Control architecture, this object is produced by the **Local AI analysis layer**.
 
-```text
-Google Meet
-      ↓
-      Transcript
-      ↓
-AI Analysis
-```
-
-or:
-
-```text
-meeting.md
-      ↓
-Transcript Loader
-      ↓
-AI Analysis
-```
-
-Both approaches can ultimately produce the same `Transcript` representation.
+This separation keeps the transcript and reporting components independent from the AI provider.
 
 ---
 
-# 🧠 Design Principles
-
-Several principles guided the implementation.
-
-### Single responsibility
-
-The loader is responsible for **loading and validating transcripts**.
-
-It does not:
-
-- Analyze meetings
-- Generate summaries
-- Extract decisions
-- Communicate with Grist
-- Communicate with Buzz
-- Call external AI APIs
-
-This keeps the component easy to understand and maintain.
-
-### Explicit validation
-
-Invalid inputs are rejected early.
-
-This avoids pushing malformed data further into the application.
-
-### Stable interface
-
-The rest of Mission Control only needs:
-
-```python
-load_transcript(path)
-```
-
-The internal implementation can evolve without requiring changes to every consumer.
-
-### No external dependency
-
-The transcript loader relies on Python's standard library for file handling.
-
-This makes it lightweight and easy to deploy.
-
----
-
-# 📁 Project Structure
+## Project Structure
 
 ```text
-mission-control/
+transcription/
+├── demo/
+│   ├── cybersecurity_meeting.txt
+│   ├── project_alpha.md
+│   ├── team_planning.txt
+│   └── reports/
+│       └── project_alpha_demo_report.md
 │
 ├── mission_control/
+│   ├── __init__.py
+│   │
+│   ├── analysis/
+│   │   ├── __init__.py
+│   │   └── models.py
+│   │
 │   └── transcript/
 │       ├── __init__.py
 │       ├── loader.py
 │       └── models.py
 │
-├── tests/
-│   ├── test_transcript.py
-│   └── data/
-│       ├── meeting.txt
-│       ├── meeting.md
-│       ├── empty.txt
-│       └── meeting.pdf
+│   └── report.py
 │
-├── demo/
-│   ├── cybersecurity_meeting.txt
-│   ├── project_alpha.md
-│   └── team_planning.txt
+├── tests/
+│   ├── data/
+│   │   ├── empty.txt
+│   │   ├── french_accents.txt
+│   │   ├── meeting.md
+│   │   ├── meeting.pdf
+│   │   └── meeting.txt
+│   │
+│   ├── test_report.py
+│   └── test_transcript.py
 │
 ├── pyproject.toml
 └── README.md
@@ -421,149 +308,140 @@ mission-control/
 
 ---
 
-# ⚙️ Installation
+## Design Principles
 
-The project uses Python packaging through `pyproject.toml`.
+### Stable MVP first
 
-Install the project and its test dependencies with:
+The core Mission Control workflow must not depend on an external meeting provider.
 
-```bash
-python -m pip install -e ".[test]"
-```
+Transcript files provide a reliable fallback input when Meet or another meeting service is unavailable.
 
-Then run:
+### Separation of responsibilities
 
-```bash
-pytest -v
-```
-
-Expected result:
+Each component has a single responsibility:
 
 ```text
-6 passed
+Transcript Loader
+    → Reads and validates transcript files
+
+MeetingAnalysis Models
+    → Represents structured AI analysis results
+
+Report Generator
+    → Converts analysis into human-readable Markdown
+```
+
+The Local AI layer can therefore evolve independently.
+
+### No invented information
+
+The analysis contract explicitly allows unknown information.
+
+For example:
+
+```python
+assignee=None
+due_date=None
+```
+
+is preferable to guessing information that was not present in the transcript.
+
+### UTF-8 by default
+
+Transcript files are read using UTF-8 to preserve multilingual content and characters such as:
+
+```text
+é è ê à ç ù œ É
 ```
 
 ---
 
-# 🛠️ Technologies
+## External Integrations
 
-| Technology | Purpose |
-|---|---|
-| Python | Main programming language |
-| `pathlib` | File and path management |
-| `dataclasses` | Transcript data model |
-| pytest | Automated testing |
-| UTF-8 | French text support |
+External meeting and document services are intentionally **not required for the stable MVP**.
 
-No external API is required for this component.
+The implemented components can operate entirely from local transcript files.
+
+Potential integrations such as La Suite Docs or Google Meet can consume the existing interfaces later without changing the core transcript-loading logic.
+
+This makes the module usable even when external APIs are unavailable.
 
 ---
 
-# 🚧 Current Scope
+## Definition of Done
 
-This component intentionally focuses only on transcript input.
-
-It does not implement:
-
-- Local AI analysis
-- Meeting summaries
-- Decision extraction
-- Action extraction
-- Grist integration
-- Buzz integration
-- Google Meet integration
-- Docs integration
-- Agenda functionality
-
-Those responsibilities belong to other parts of Mission Control.
-
----
-
-# 🚀 Possible Future Improvements
-
-The current implementation provides the required MVP functionality while leaving room for future extensions.
-
-Possible improvements include:
-
-- Additional transcript formats
-- Automatic format detection
-- Streaming large transcripts
-- More advanced input validation
-- Transcript metadata extraction
-- Integration with live meeting services
-- Additional test cases
-
-These extensions can be added without changing the fundamental `Transcript` interface.
-
----
-
-# 📚 What I Learned
-
-This part of the project gave me practical experience with:
-
-- Python project structure
-- Modules and packages
-- Dataclasses
-- Type hints
-- File handling with `pathlib`
-- UTF-8 text processing
-- Input validation
-- Exception handling
-- Automated testing with pytest
-- Designing a stable interface between components
-
-More importantly, the project introduced me to an important software engineering principle:
-
-> A component should have a clear responsibility and provide a predictable interface to the rest of the application.
-
----
-
-# ✅ Definition of Done — Part A
-
-The Transcript Input component satisfies the required objectives:
+### Required
 
 - [x] TXT transcript loading
 - [x] Markdown transcript loading
-- [x] Path validation
-- [x] File validation
-- [x] Empty transcript rejection
-- [x] UTF-8/French text preservation
-- [x] Consistent `Transcript` representation
+- [x] UTF-8/French character preservation
+- [x] Empty-file validation
+- [x] Missing-file validation
+- [x] Unsupported-extension validation
+- [x] Realistic English demo transcripts
+- [x] Structured `MeetingAnalysis` model
+- [x] Markdown meeting report generation
 - [x] Automated tests
-- [x] French demo transcripts
+- [x] End-to-end demonstration
+
+### Optional integrations
+
+- [ ] Import generated reports into La Suite Docs
+- [ ] External meeting provider integration
+
+These integrations are not required for the stable Mission Control MVP.
 
 ---
 
-# 👨‍💻 Contribution Summary
+## Quick Start
 
-**Role:** Dev 6 — Transcript Input
+```bash
+cd transcription
 
-**Main contribution:** Python transcript ingestion module
-
-**Input formats:** `.txt`, `.md`
-
-**Testing:** `pytest` — 6 tests passing
-
-**Focus:** Reliable input validation, UTF-8 support and clean integration with the Mission Control pipeline.
-
----
-
-## ⭐ Why This Component Matters
-
-A meeting-analysis system is only as reliable as the data it receives.
-
-The Transcript Input component provides a simple and controlled entry point into Mission Control:
-
-```text
-Untrusted file
-     ↓
-Validation
-     ↓
-UTF-8 content
-     ↓
-Transcript object
-     ↓
-AI analysis
+python -m pytest -v
 ```
 
-By isolating this responsibility, the rest of the system can focus on understanding the meeting rather than dealing with file formats and invalid input.
+To load a transcript:
+
+```python
+from mission_control.transcript import load_transcript
+
+transcript = load_transcript("demo/project_alpha.md")
+
+print(transcript.content)
+```
+
+To generate a report:
+
+```python
+from mission_control.report import generate_markdown_report
+
+markdown = generate_markdown_report(analysis)
+
+print(markdown)
+```
+
+To save it:
+
+```python
+from mission_control.report import save_markdown_report
+
+save_markdown_report(
+    analysis,
+    "demo/reports/project_alpha_demo_report.md",
+)
+```
+
+---
+
+## Status
+
+**Mission Control — Transcript Input & Meeting Reports: MVP implemented and tested.**
+
+Test status:
+
+```text
+10 passed
+```
+
+The module is ready to be connected to the Local AI analysis layer and the rest of the Mission Control pipeline.
