@@ -1,15 +1,25 @@
 # Mission Control
 
-Projet de hackathon : donner à une IA les moyens d'agir comme un·e collègue omniscient·e
-et omniprésent·e au sein d'une organisation, en la connectant directement aux outils de
-travail — en particulier ceux de la **Suite Numérique** (DINUM) — via le protocole
-**MCP** (Model Context Protocol), et en l'exposant dans **Buzz**, un outil de messagerie
-d'équipe avec agents IA intégrés.
+Projet de hackathon : construire, dans **Tchap** (la messagerie sécurisée de l'État),
+un écosystème où **agents IA et humains cohabitent et travaillent ensemble** sur des
+projets concrets — pas une IA à qui l'on pose des questions dans son coin, mais une
+collègue à part entière, avec accès au contexte global de l'équipe, connectée en
+direct aux outils de travail (en particulier ceux de la **Suite Numérique**, DINUM) via
+le protocole **MCP** (Model Context Protocol). **Buzz**, une messagerie d'équipe avec
+agents IA intégrés, sert de prototype de travail pour ce hackathon.
 
 ## Le problème
 
-Quand plusieurs équipes ou ministères travaillent ensemble sur un projet commun, deux
-frictions ralentissent tout le monde :
+Aujourd'hui, tout le monde utilise déjà massivement l'IA au travail — mais chacun dans
+son coin, avec son propre modèle, qui n'a accès qu'à **son** contexte personnel, jamais
+à celui du groupe. Chaque personne a sa propre conversation isolée avec sa propre IA ;
+la connaissance et les décisions qui en sortent restent enfermées dans ces échanges
+individuels, invisibles pour le reste de l'équipe. Un projet commun avance donc avec
+autant de versions fragmentées de la réalité qu'il y a de personnes qui utilisent
+chacune leur IA séparément.
+
+Cette fragmentation se traduit concrètement par deux frictions, en particulier quand
+plusieurs équipes ou ministères travaillent ensemble :
 
 1. **L'information**
    - *Délai* : obtenir une information nécessite de la chercher soi-même (fouiller des
@@ -22,14 +32,26 @@ frictions ralentissent tout le monde :
    bloquée ; une personne qui le maîtrise n'a pas forcément le temps ou l'envie de le
    faire elle-même.
 
-## La réponse : un agent IA connecté en direct aux outils
+## La réponse : un écosystème partagé, pas un chatbot
 
-Un agent IA qui peut lire et écrire directement dans les outils de travail élimine les
-deux frictions à la fois :
-- Il répond **instantanément**, avec la donnée **actuelle** (pas une copie périmée),
-  puisqu'il va la chercher lui-même dans les vrais outils au moment de la question.
-- Il **agit à la place de l'utilisateur** (créer un document, mettre à jour un tableau
-  de suivi, partager un fichier) sur simple demande en langage naturel.
+Mission Control n'est pas une interaction bilatérale (je demande une info à un bot, je
+la récupère). L'objectif est que l'agent IA vive **dans l'espace de travail commun**, au
+même endroit que les humains, avec accès au **contexte global du projet** — pas
+seulement à ce qu'une seule personne lui a raconté dans son coin. Concrètement, ça lui
+permet de :
+
+- suivre et interagir naturellement dans les discussions de groupe, pas seulement
+  répondre à qui l'interpelle directement,
+- proposer des choses de sa propre initiative (pas uniquement réagir à une question),
+- aider à obtenir ou vérifier une information pour **toute l'équipe** en même temps,
+  avec une donnée toujours à jour puisqu'il va la chercher lui-même dans les vrais
+  outils au moment voulu,
+- agir directement sur les outils partagés (créer un document, mettre à jour un
+  tableau de suivi, partager un fichier) au nom du groupe, sur simple demande en
+  langage naturel.
+
+L'IA cesse d'être un outil personnel isolé pour devenir un membre à part entière de
+l'équipe, avec la même vue d'ensemble que tout le monde.
 
 ## Architecture
 
