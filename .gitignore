@@ -1,5 +1,6 @@
 buzz/
 docs/
+drive/
 mcp-servers/keycloak-backup/
 mcp-servers/.env
 
