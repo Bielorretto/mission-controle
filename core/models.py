@@ -8,6 +8,7 @@ class ActionItem:
     assignee: str | None
     due_date: str | None
     status: str = "todo"
+    dependency: str | None = None
 
 @dataclass
 class Decision:

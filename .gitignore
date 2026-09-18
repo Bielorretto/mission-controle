@@ -16,3 +16,7 @@ __pycache__/
 *.pyo
 *.pyd
 
+
+# Real meeting recordings - local only
+samples/recordings/
+.DS_Store

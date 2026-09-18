@@ -29,7 +29,8 @@ The JSON must follow exactly this structure:
       "description": "string",
       "assignee": "string or null",
       "due_date": "string or null",
-      "status": "todo"
+      "status": "todo",
+      "dependency": "string or null"
     }
   ]
 }
@@ -42,6 +43,9 @@ Rules:
 - Do not invent an assignee or due date.
 - Use null when an assignee or due date is unknown.
 - Every action must have status "todo".
+- If an action depends on, or blocks, another action mentioned in the meeting,
+  describe that relationship in "dependency" (e.g. "Depends on the list being
+  sent on Wednesday"). Use null when there is no such relationship.
 """
 
 class OllamaMeetingAnalyzer(MeetingAnalyzer):
@@ -98,6 +102,7 @@ class OllamaMeetingAnalyzer(MeetingAnalyzer):
                 assignee=action.get("assignee"),
                 due_date=action.get("due_date"),
                 status=action.get("status", "todo"),
+                dependency=action.get("dependency"),
             )
             for action in parsed["actions"]
         ]

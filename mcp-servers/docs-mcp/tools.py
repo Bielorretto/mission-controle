@@ -1,12 +1,21 @@
 # docs-mcp/tools.py
 import os
+import sys
+from pathlib import Path
+
 import requests
 from dotenv import load_dotenv
 from shared.auth import KeycloakAuth
 
-load_dotenv()
+_DOCS_MCP_DIR = Path(__file__).resolve().parent
+_REPO_ROOT = _DOCS_MCP_DIR.parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
-DOCS_API_URL = "http://localhost:8071/external_api/v1.0"
+load_dotenv()
+load_dotenv(_DOCS_MCP_DIR / ".env")
+
+DOCS_API_URL = "http://localhost:18071/external_api/v1.0"
 
 auth = KeycloakAuth(
     keycloak_url=os.environ["KEYCLOAK_URL"],
@@ -157,6 +166,80 @@ def share_document(document_id: str, reach: str = "authenticated", role: str = "
             "Content-Type": "application/json",
         },
         json={"link_reach": reach, "link_role": role},
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def create_document_as_owner(title: str, content: str) -> dict:
+    """Create a document via the server-to-server create-for-owner API,
+    owned by the configured LA_SUITE_DOCS_OWNER_SUB/EMAIL user (the demo
+    "impress" account). Unlike create_document() above (which authenticates
+    via Keycloak and requires OIDC resource-server auth to be enabled on the
+    Docs backend), this reuses the same already-validated path Mission
+    Control's own suivi workflow uses, so it works against this environment
+    as-is."""
+    from core.integrations.la_suite_docs_client import create_document_for_owner
+
+    base_url = os.environ.get(
+        "LA_SUITE_DOCS_BASE_URL", "http://localhost:18071/api/v1.0"
+    )
+    token = os.environ["LA_SUITE_DOCS_TOKEN"]
+    owner_sub = os.environ["LA_SUITE_DOCS_OWNER_SUB"]
+    owner_email = os.environ["LA_SUITE_DOCS_OWNER_EMAIL"]
+
+    result = create_document_for_owner(
+        base_url=base_url,
+        token=token,
+        title=title,
+        content=content,
+        sub=owner_sub,
+        email=owner_email,
+    )
+    return {"id": result["id"], "title": title}
+
+
+def _server_to_server_config():
+    base_url = os.environ.get(
+        "LA_SUITE_DOCS_BASE_URL", "http://localhost:18071/api/v1.0"
+    )
+    token = os.environ["LA_SUITE_DOCS_TOKEN"]
+    owner_sub = os.environ["LA_SUITE_DOCS_OWNER_SUB"]
+    return base_url, token, owner_sub
+
+
+def search_documents_as_owner(title: str = None) -> list:
+    """List/search documents accessible to the configured owner
+    (LA_SUITE_DOCS_OWNER_SUB), optionally filtered by a title substring.
+    Uses the same server-to-server path as create_document_as_owner, so it
+    works against this environment as-is (no Keycloak resource-server auth
+    required)."""
+    base_url, token, owner_sub = _server_to_server_config()
+
+    params = {"sub": owner_sub}
+    if title:
+        params["title"] = title
+
+    response = requests.get(
+        f"{base_url}/documents/list-for-owner/",
+        headers={"Authorization": f"Bearer {token}"},
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def get_document_content_as_owner(document_id: str) -> dict:
+    """Read a document's actual title and content (as markdown), scoped to
+    the configured owner. Returns only documents that owner actually has
+    access to. Uses the same server-to-server path as
+    create_document_as_owner."""
+    base_url, token, owner_sub = _server_to_server_config()
+
+    response = requests.get(
+        f"{base_url}/documents/{document_id}/content-for-owner/",
+        headers={"Authorization": f"Bearer {token}"},
+        params={"sub": owner_sub},
     )
     response.raise_for_status()
     return response.json()

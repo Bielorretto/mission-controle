@@ -23,6 +23,11 @@ def format_meeting_analysis_as_markdown(analysis: MeetingAnalysis) -> str:
     else:
         lines.append("- Aucune action enregistrée.")
 
+    dependencies = [action.dependency for action in analysis.actions if action.dependency]
+    if dependencies:
+        lines.extend(["", "## Point d'attention"])
+        lines.extend(f"- {dependency}" for dependency in dependencies)
+
     return "\n".join(lines) + "\n"
 
 
